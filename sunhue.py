@@ -38,21 +38,21 @@ def get_noon(date_time, latitude, longitude):
     noon_local = noon_utc.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Europe/Berlin"))
     return noon_local
 
-def classify_time(altitude):
-    if altitude < -6 * math.pi / 180:  # Night
+def classify_time(date_time, sunrise, sunset):
+    if date_time < sunrise:
         return "Night"
-    elif altitude < 0:  # Before sunrise or after sunset
-        return "Sunrise/Sunset"
-    elif altitude < 45 * math.pi / 180:  # Before noon
+    elif date_time < sunrise + timedelta(minutes=30):
+        return "Sunrise"
+    elif date_time < noon:
         return "Before Noon"
-    elif altitude == 90 * math.pi / 180:  # Noon
-        return "Noon"
-    elif altitude < 135 * math.pi / 180:  # Afternoon
+    elif date_time < sunset - timedelta(minutes=30):
         return "Afternoon"
-    else:  # Before sunset
+    elif date_time < sunset:
         return "Sunset"
+    else:
+        return "Night"
 
-def calculate_daylight_percent(date_time, sunrise, sunset, noon):
+def calculate_daylight_percent(date_time, sunrise, sunset):
     daylight_duration = sunset - sunrise
     elapsed_time = date_time - sunrise
     if elapsed_time.total_seconds() < 0:
@@ -125,10 +125,10 @@ def main():
     noon = get_noon(date_time_utc, latitude, longitude)
     
     # Classify time
-    time_category = classify_time(altitude)
+    time_category = classify_time(date_time_local, sunrise, sunset)
 
     # Calculate daylight percentage
-    daylight_percent = calculate_daylight_percent(date_time_local, sunrise, sunset, noon)
+    daylight_percent = calculate_daylight_percent(date_time_local, sunrise, sunset)
     
     # Round daylight percentage
     rounded_daylight_percent = round(daylight_percent)
@@ -150,7 +150,7 @@ def main():
     print("Current location (latitude, longitude):", latitude, longitude)
     print("Sun position (altitude, azimuth):", math.degrees(altitude), math.degrees(azimuth))
     print("Time category:", time_category)
-    print("Daylight percentage:", rounded_daylight_percent, "%")
+    print("Daylight percentage:", rounded_daylight_percent)
     print("Sun color temperature:", sun_temperature, "Kelvin")
     print("Sun hexadecimal color code:", sun_hex_color)
 
