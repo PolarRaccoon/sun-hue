@@ -38,16 +38,16 @@ def get_noon(date_time, latitude, longitude):
     noon_local = noon_utc.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Europe/Berlin"))
     return noon_local
 
-def classify_time(date_time, sunrise, sunset):
+def classify_time(date_time, sunrise, sunset, noon):
     if date_time < sunrise:
         return "Night"
-    elif date_time < sunrise + timedelta(minutes=30):
+    elif sunrise <= date_time < (sunrise + timedelta(minutes=30)):
         return "Sunrise"
-    elif date_time < noon:
+    elif sunrise + timedelta(minutes=30) <= date_time < noon:
         return "Before Noon"
-    elif date_time < sunset - timedelta(minutes=30):
+    elif noon <= date_time < sunset - timedelta(minutes=30):
         return "Afternoon"
-    elif date_time < sunset:
+    elif sunset - timedelta(minutes=30) <= date_time < sunset:
         return "Sunset"
     else:
         return "Night"
@@ -125,7 +125,7 @@ def main():
     noon = get_noon(date_time_utc, latitude, longitude)
     
     # Classify time
-    time_category = classify_time(date_time_local, sunrise, sunset)
+    time_category = classify_time(date_time_local, sunrise, sunset, noon)
 
     # Calculate daylight percentage
     daylight_percent = calculate_daylight_percent(date_time_local, sunrise, sunset)
