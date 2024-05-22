@@ -41,13 +41,13 @@ def get_noon(date_time, latitude, longitude):
 def classify_time(date_time, sunrise, sunset, noon):
     if date_time < sunrise:
         return "Night"
-    elif sunrise <= date_time < (sunrise + timedelta(minutes=30)):
+    elif date_time < sunrise + timedelta(minutes=30):
         return "Sunrise"
-    elif sunrise + timedelta(minutes=30) <= date_time < noon:
+    elif date_time < noon:
         return "Before Noon"
-    elif noon <= date_time < sunset - timedelta(minutes=30):
+    elif date_time < sunset - timedelta(minutes=30):
         return "Afternoon"
-    elif sunset - timedelta(minutes=30) <= date_time < sunset:
+    elif date_time < sunset:
         return "Sunset"
     else:
         return "Night"
